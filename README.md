@@ -8,33 +8,18 @@
 
 ## Запуск
 
-### Клонирование репозитория
-
-```bash
-git clone https://github.com/<ваш-username>/<имя-репозитория>.git
-cd <имя-репозитория>
-```
-
 ### Сборка и запуск
 
-Используйте **файл решения** или **файл проекта**:
-
-```bash
-# Вариант 1: из корня репозитория (решение)
-dotnet run --project task1_framework.sln
-
-# Вариант 2: указать проект явно
-dotnet run --project Pr1.MinWebService.csproj
+Запустите проект в Visual Studio Code через терминал:
 ```
-
-Либо откройте **`task1_framework.sln`** в Visual Studio / Rider и запустите проект (F5).
+dotnet run
+```
 
 После запуска в консоли будет указан адрес приложения, например:
 
 - **HTTP:** `http://localhost:54255`
 - **HTTPS:** `https://localhost:54254`
 
-Порт может отличаться — смотрите вывод `dotnet run` или настройки в `Properties/launchSettings.json`.
 
 ---
 
@@ -53,53 +38,14 @@ dotnet run --project Pr1.MinWebService.csproj
 ---
 
 ## Испытания и проверка результата
-
-Подробное описание проверок, тестов и ручного прогона — в документе [**VERIFICATION.md**](VERIFICATION.md). Кратко:
-
 1. **Логика предметной области** — unit-тесты валидатора (`CreateItemRequestValidatorTests`): непустое имя, неотрицательный год.
 2. **Взаимодействие с веб-службой** — интеграционные тесты (`ItemsApiTests`): создание элемента и получение его по id; запрос по несуществующему id возвращает 404 в едином формате ошибки (`code`, `message`, `requestId`).
 3. **Журнал** — для каждого запроса в консоли есть строка с идентификатором запроса и временем выполнения (мс).
-4. **Ручной прогон** — в VERIFICATION.md приведены готовые команды (PowerShell и curl) для воспроизведения сценариев за пару минут.
 
 Запуск всех тестов:
 
 ```bash
 dotnet test task1_framework.sln
-```
-
----
-
-## Проверка вручную (Postman / curl)
-
-### Postman
-
-1. Убедитесь, что приложение запущено.
-2. Создайте запросы по таблице выше. Базовый URL — тот, что показан при запуске (например, `http://localhost:54255`).
-
-**Быстрая проверка:**
-
-- **GET** `http://localhost:54255/api/items` → ответ `200`, тело `[]` или массив записей.
-- **POST** `http://localhost:54255/api/items` → Body: **raw**, **JSON**:
-  ```json
-  { "name": "Half-Life 2", "year": 2004 }
-  ```
-  → ответ `201`, в заголовке `Location` и в теле — созданная запись с полем `id`.
-- **GET** `http://localhost:54255/api/items/{id}` (подставьте `id` из POST) → ответ `200` и одна запись.
-- **GET** `http://localhost:54255/api/items/00000000-0000-0000-0000-000000000001` → ответ `404` и JSON с `code`, `message`, `requestId`.
-
-Подробные сценарии и примеры ответов — в файле [**POSTMAN.md**](POSTMAN.md).
-
-### curl (примеры)
-
-```bash
-# Список
-curl -i http://localhost:54255/api/items
-
-# Создание
-curl -i -X POST http://localhost:54255/api/items -H "Content-Type: application/json" -d "{\"name\": \"The Witcher 3\", \"year\": 2015}"
-
-# Получение по id (подставьте свой GUID)
-curl -i http://localhost:54255/api/items/<guid>
 ```
 
 ---
